@@ -1,0 +1,16 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  bin = "tmp/main"
+  cmd = "go build -o tmp/main ."
+  include_ext = ["go"]
+  exclude_dir = ["pkg", "vendor", "tmp", ".git"]
+  run_after_build = "chmod +x ./tmp/main"
+
+  # DO NOT set include_dir (watch all under root)
+  # DO NOT set dir unless you need to run build elsewhere
+
+[log]
+  level = "debug"
+
