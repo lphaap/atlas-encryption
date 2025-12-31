@@ -9,12 +9,7 @@ import (
 )
 
 func main() {
-	err := godotenv.Load(".env", "../.env")
-	if err != nil {
-		log.Println("Warning: .env file not found")
-	} else {
-		log.Println(".env file loaded successfully")
-	}
+	godotenv.Load()
 
 	app := fiber.New()
 	endpoints.Router(app)

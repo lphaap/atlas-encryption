@@ -24,15 +24,19 @@ func Key(fiber *fiber.Ctx) error {
 		return api.Response.BadRequest(fiber, error)
 	}
 
-	key := os.Getenv("sentry-two-encryption-key")
+	key := os.Getenv("SENTRYTWO_KEY")
 	if key == "" {
-		error := lib.Object{"error": "Encryption key not found"}
+		error := lib.Object{
+			"error": "Encryption key not found",
+		}
 		return api.Response.InternalServerError(fiber, error)
 	}
 	
 	decrypted, err := lib.Decrypt(request.Encrypted, key)
 	if err != nil {
-		error := lib.Object{"error": "Decryption failed"}
+		error := lib.Object{
+			"error": "Decryption failed",
+		}
 		return api.Response.InternalServerError(fiber, error)
 	}
 

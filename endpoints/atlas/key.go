@@ -1,16 +1,45 @@
 package atlas
 
 import (
+	"os"
 	"main/lib"
 	"main/lib/api"
-
 	"github.com/gofiber/fiber/v2"
 )
 
+type AtlasKeyRequest struct {
+	Encrypted string `json:"encrypted"`
+}
+
 func Key(fiber *fiber.Ctx) error {
-	fiber = api.JsonEndpoint(fiber)
-	var key = "example_key"
+	var request AtlasKeyRequest
+
+	if err := fiber.BodyParser(&request); err != nil {
+		error := lib.Object{"error": "Parameter encrypted is required"}
+		return api.Response.BadRequest(fiber, error)
+	}
+
+	if request.Encrypted == "" {
+		error := lib.Object{"error": "Parameter encrypted is required"}
+		return api.Response.BadRequest(fiber, error)
+	}
+
+	key := os.Getenv("ATLAS_KEY")
+	if key == "" {
+		error := lib.Object{
+			"error": "Encryption key not found",
+		}
+		return api.Response.InternalServerError(fiber, error)
+	}
 	
-	data := lib.Object{ "key": key }
+	decrypted, err := lib.Decrypt(request.Encrypted, key)
+	if err != nil {
+		error := lib.Object{
+			"error": "Decryption failed",
+		}
+		return api.Response.InternalServerError(fiber, error)
+	}
+
+	data := lib.Object{"decrypted": decrypted}
 	return api.Response.OK(fiber, data)
 }
